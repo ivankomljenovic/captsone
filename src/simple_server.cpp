@@ -31,7 +31,7 @@ int main(int argc, char *argv[]){
     static unsigned short port = 1864;
     server_address.sin_port = htons(port);
 
-    inet_aton("10.91.145.22", &(server_address.sin_addr));
+    inet_aton("127.0.0.1", &(server_address.sin_addr));
 
     // string ip_address = "130.15.85.123";
 

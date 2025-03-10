@@ -24,42 +24,9 @@ int main(int argc, char *argv[]){
     memset(&sa,0,sizeof(sa));
     sa.sin_family = AF_INET;
     sa.sin_port = htons(1864);
-    inet_aton("10.91.145.22", &(sa.sin_addr)); // provided by incus
+    inet_aton("127.0.0.1", &(sa.sin_addr));
 
-    
-
-    // struct addrinfo *addr_serv;
-    // struct addrinfo hints;
-
-    // hints.ai_family = AF_INET; // IPv4
-    // hints.ai_socktype = SOCK_DGRAM; // UDP
-    // hints.ai_protocol = 0; // any protocol
-    // hints.ai_flags = 0; // no flags
-
-    // int e; // store error result of getaddrinfo
-
-    // if ((e = getaddrinfo(serv_name.c_str(), nullptr, nullptr, &addr_serv)) < 0){
-    //     cout << "Error: Server address not found for name: " << serv_name.c_str() << endl;
-    //     exit(1);
-    // }
-
-    // addrinfo * rover = addr_serv;
-    // while (rover != nullptr){
-    //     if ((((sockaddr_in*)rover->ai_addr)->sin_addr).s_addr != 0) {
-    //         // First non-zero address
-    //         cout << "Server address is: " << inet_ntoa(((sockaddr_in*)rover->ai_addr)->sin_addr) << endl;
-    //         sa.sin_addr = ((sockaddr_in*)rover->ai_addr)->sin_addr;
-    //         break;
-    //     }
-    //     rover = rover->ai_next;
-    // }
-    // freeaddrinfo(addr_serv);
-
-    // struct sockaddr dest_address;
-    // dest_address.sa_family = AF_INET;
-    // dest_address.sa_data = inet_aton("0".c_str(), &dest_address.sa_data);
-
-    // Bind not needed for UDP client
+    // Bind not needed for client
 
     // Send message to the server
     char myMessage[12];
