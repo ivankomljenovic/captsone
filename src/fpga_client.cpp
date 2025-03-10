@@ -16,10 +16,12 @@ class Client {
         bool wasInitialized;
         string addressName;
         int portNumber;
+        bool verbose;
 
-        Client(string serverIP, int portNumber){
+        Client(string serverIP, int portNumber, bool v){
             addressName = serverIP;
             this->portNumber = portNumber;
+            verbose = v;
 
             memset(&serverAddress, 0, sizeof(serverAddress));
             serverAddress.sin_family = AF_INET;
@@ -68,11 +70,13 @@ class Client {
                 return -1;
             }
 
-            cout << "Message sent successfully:" << endl;        
-            cout << "Bytes sent: " << bytesSent << endl;
-            cout << "Address: " << addressName << endl;
-            cout << "Port: " << portNumber << endl;
-            cout << "Message: " << message << endl;
+            if (verbose){
+                cout << "Message sent successfully:" << endl;        
+                cout << "Bytes sent: " << bytesSent << endl;
+                cout << "Address: " << addressName << endl;
+                cout << "Port: " << portNumber << endl;
+                cout << "Message: " << message << endl;
+            }
 
             return 0;
         }
@@ -81,17 +85,44 @@ class Client {
 
 
 int main(int argc, char *argv[]){
-    
-    if (argc != 2){ // Requires 1 command line parameter, server IP address
-        cout << "Error: Server IP address requried. E.g. ./client 127.0.0.1" << endl;
+    bool verbose = false; // do I want lots of output messages in the console?
+
+    if (argc < 2){ // Requires 1 command line parameter, server IP address
+        cout << "Error: Server IP address requried. E.g. ./client 127.0.0.1 -v" << endl;
+    }
+
+    if (argc > 2 && (argv[2][0] == '-' && argv[2][1] == 'v')){
+        verbose = true;
     }
 
     // Main program - send one test message
-    Client fpga_client(argv[1],1864);
+    Client fpga_client(argv[1],1864, verbose);
 
     fpga_client.initSocket();
 
-    fpga_client.sendMessage("Hello World");
+    // Build message to send
+
+    // 102 mics with 32 bits each
+    int mic_count = 102;
+    int32_t mic_data[mic_count];
+
+    for (int i = 0; i < mic_count; i++){
+        mic_data[i] = 0xFFFFFFFF; // fill with ones
+    }
+
+    string my_message = "";
+
+    for (int i = 0; i < mic_count; i++){
+        my_message = my_message + to_string(mic_data[i]);
+    }
+
+    cout << "Sending test messages at 100 kHz." << endl;
+
+    while (true){
+        usleep(10);
+
+        fpga_client.sendMessage(my_message);
+    }
 
     fpga_client.closeSocket();
 }
