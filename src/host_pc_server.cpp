@@ -8,108 +8,114 @@
 #include <atomic>
 #include <arpa/inet.h>
 #include <cstring>
+#include <thread>
+#include <mutex>
+
+#include "host_pc_server.h"
 
 using namespace std;
 using namespace string_literals;
 
-class Server {
-    public:
-        int socketFD;
-        struct sockaddr_in serverAddress;
-        bool wasInitialized;
-        string addressName;
-        int portNumber;
-        bool verbose;
-        int bufferSize;
+void threadServer(Server activeServer){
+    char message[activeServer.bufferSize];
+    struct sockaddr sourceAddress;
+    socklen_t sourceLength;
 
-        Server(string serverIP, int portNumber, int bufferSize, bool v){
-            addressName = serverIP;
-            this->portNumber = portNumber;
-            verbose = v;
-            this->bufferSize = bufferSize;
 
-            memset(&serverAddress, 0, sizeof(serverAddress));
-            serverAddress.sin_family = AF_INET;
-            serverAddress.sin_addr.s_addr = INADDR_ANY;
-            serverAddress.sin_port = htons(portNumber);
-            inet_aton(serverIP.c_str(), &(serverAddress.sin_addr));
+    while (true){
+        if ((recvfrom(activeServer.socketFD, message, sizeof(message), 0, &sourceAddress, &sourceLength)) < 0){
+            cout << "Error: Error receiving the message." << endl;
 
-            socketFD = 0;
-            wasInitialized = false;
+            cout << "Shutting down the server." << endl;
+            return;
         }
 
-        int initSocket(){
-            if ((socketFD = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
-                cout << "Error: Socket could not be initialized." << endl;
-                return -1;
-            }
-
-            if ((::bind(socketFD, (const struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
-                cout << "Error: Could not bind socket." << endl;
-                return -1;
-            }
-            
-            wasInitialized = true;
-
-            cout << "Socket successfully initialized." << endl;
-
-            return 0;
-        }
-
-        int closeSocket(){
-            if (!wasInitialized){
-                cout << "Error: Socket is not open." << endl;
-                return -1;
-            }
-            close(socketFD);
-
-            wasInitialized = false;
-            return 0;
-        }
-
-        int sendMessage(string message){
-            size_t bytesSent;
-
-            if (!wasInitialized){
-                cout << "Error: Socket was not initialized." << endl;
-                return -1;
-            }
-                
-
-            if ((bytesSent = sendto(socketFD, (const char *)message.c_str(), sizeof(message), 0, (const struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
-                cout << "Error: Could not send message." << endl;
-                return -1;
-            }
-
-            if (verbose){
-                cout << "Message sent successfully:" << endl;        
-                cout << "Bytes sent: " << bytesSent << endl;
-                cout << "Address: " << addressName << endl;
-                cout << "Port: " << portNumber << endl;
-                cout << "Message: " << message << endl;
-            }
-
-            return 0;
-        }
-
-        int runServer (){
-            char message[bufferSize];
-            struct sockaddr sourceAddress;
-            socklen_t sourceLength;
+        cout << "Received message: " << message << endl;
+    }
+}
 
 
-            while (true){
-                if ((recvfrom(socketFD, message, sizeof(message), 0, &sourceAddress, &sourceLength)) < 0){
-                    cout << "Error: Error receiving the message." << endl;
+Server::Server(string serverIP, int portNumber, int bufferSize, bool v){
+    addressName = serverIP;
+    this->portNumber = portNumber;
+    verbose = v;
+    this->bufferSize = bufferSize;
 
-                    cout << "Shutting down the server." << endl;
-                    return -1;
-                }
+    for (int i = 0; i < 102; i++){
+        frame[i] = 0;
+    }
 
-                cout << "Received message: " << message << endl;
-            }
-        }
-};
+    memset(&serverAddress, 0, sizeof(serverAddress));
+    serverAddress.sin_family = AF_INET;
+    serverAddress.sin_addr.s_addr = INADDR_ANY;
+    serverAddress.sin_port = htons(portNumber);
+    inet_aton(serverIP.c_str(), &(serverAddress.sin_addr));
+
+    socketFD = 0;
+    wasInitialized = false;
+}
+
+int Server::initSocket(){
+    if ((socketFD = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+        cout << "Error: Socket could not be initialized." << endl;
+        return -1;
+    }
+
+    if ((::bind(socketFD, (const struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
+        cout << "Error: Could not bind socket." << endl;
+        return -1;
+    }
+    
+    wasInitialized = true;
+
+    cout << "Socket successfully initialized." << endl;
+
+    return 0;
+}
+
+int Server::closeSocket(){
+    if (!wasInitialized){
+        cout << "Error: Socket is not open." << endl;
+        return -1;
+    }
+    close(socketFD);
+
+    wasInitialized = false;
+    return 0;
+}
+
+int Server::sendMessage(string message){
+    size_t bytesSent;
+
+    if (!wasInitialized){
+        cout << "Error: Socket was not initialized." << endl;
+        return -1;
+    }
+        
+
+    if ((bytesSent = sendto(socketFD, (const char *)message.c_str(), sizeof(message), 0, (const struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
+        cout << "Error: Could not send message." << endl;
+        return -1;
+    }
+
+    if (verbose){
+        cout << "Message sent successfully:" << endl;        
+        cout << "Bytes sent: " << bytesSent << endl;
+        cout << "Address: " << addressName << endl;
+        cout << "Port: " << portNumber << endl;
+        cout << "Message: " << message << endl;
+    }
+
+    return 0;
+}
+
+thread Server::startServer (){
+    thread serverThread(threadServer, this);
+
+    return serverThread;
+}
+
+
 
 int main(int argc, char *argv[]){
     bool verbose = false;
@@ -122,13 +128,20 @@ int main(int argc, char *argv[]){
     if (argc > 2 && (argv[2][0] == '-' && argv[2][1] == 'v'))
         verbose = true;
 
+
+    // Initialize the server
     Server hostPC(argv[1], 1864, 10000, verbose);
-
     hostPC.initSocket();
-
     cout << "Starting server." << endl;
+    thread serverThread = hostPC.startServer();
 
-    hostPC.runServer();
 
+    // main loop
+    while (true){
+
+    }
+
+
+    serverThread.join();
     hostPC.closeSocket();
 }
