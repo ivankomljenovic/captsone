@@ -31,7 +31,7 @@ class Client {
             inet_aton(serverIP.c_str(), &(serverAddress.sin_addr));
 
             for (int i = 0; i < 102; i++){
-                frame[i] = i;
+                frame[i] = 1;
             }
 
             socketFD = 0;
@@ -98,7 +98,7 @@ class Client {
 
             msg = msg + ',';
 
-            cout << msg << endl;
+            //cout << msg << endl;
 
             return sendMessage(msg, 2048);
         }
@@ -122,31 +122,22 @@ int main(int argc, char *argv[]){
 
     fpga_client.initSocket();
 
-    // Build message to send
-
-    // 102 mics with 32 bits each
-    int mic_count = 102;
-    int32_t mic_data[mic_count];
-
-    for (int i = 0; i < mic_count; i++){
-        mic_data[i] = 0xFFFFFFFF; // fill with ones
-    }
-
-    string my_message = "";
-
-    for (int i = 0; i < mic_count; i++){
-        my_message = my_message + to_string(mic_data[i]);
-    }
-
     cout << "Sending test messages at 100 kHz." << endl;
 
-    // while (true){
-    //     usleep(10);
+    int count = 0; // variable for testing purposes
 
-    //     fpga_client.sendFrame();
-    // }
+    while (true){ // send a new microphone frame at 100 kHz rate
+        usleep(10); // should get to 10 here
 
-    fpga_client.sendFrame();
+        // update the frame with microphone data, for now populate with dummy data
+        for (int i = 0; i < 102; i++){
+            fpga_client.frame[i] = i * count;
+        }
+
+        fpga_client.sendFrame();
+
+        count++;
+    }
 
     fpga_client.closeSocket();
 }
