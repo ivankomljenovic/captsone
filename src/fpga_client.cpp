@@ -62,7 +62,7 @@ class Client {
             return 0;
         }
 
-        int sendMessage(string message){
+        int sendMessage(string message, int bufferSize){
             size_t bytesSent;
 
             if (!wasInitialized){
@@ -71,7 +71,7 @@ class Client {
             }
                 
 
-            if ((bytesSent = sendto(socketFD, (const char *)message.c_str(), sizeof(message), 0, (const struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
+            if ((bytesSent = sendto(socketFD, (const char *)message.c_str(), bufferSize, 0, (const struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
                 cout << "Error: Could not send message." << endl;
                 return -1;
             }
@@ -96,9 +96,11 @@ class Client {
                 msg = msg + ',' + to_string(frame[i]);
             }
 
+            msg = msg + ',';
+
             cout << msg << endl;
 
-            return sendMessage(msg);
+            return sendMessage(msg, 2048);
         }
 };
 

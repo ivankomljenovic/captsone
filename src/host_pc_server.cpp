@@ -33,7 +33,7 @@ void threadServer(int socketFD, int bufferSize){
 
 
     while (true){
-        if ((recvfrom(socketFD, message, sizeof(message), 0, &sourceAddress, &sourceLength)) < 0){
+        if ((recvfrom(socketFD, message, bufferSize, 0, &sourceAddress, &sourceLength)) < 0){
             cout << "Error: Error receiving the message." << endl;
 
             cout << "Shutting down the server." << endl;
@@ -42,6 +42,7 @@ void threadServer(int socketFD, int bufferSize){
 
         //cout << "Received message: " << message << endl;
         msg = string(message);
+        i = 0;
         {
             lock_guard<mutex> g(frame_lock);
 
@@ -173,7 +174,7 @@ int main(int argc, char *argv[]){
 
 
     // Initialize the server
-    Server hostPC(argv[1], 1864, 100000, verbose);
+    Server hostPC(argv[1], 1864, 2048, verbose);
     hostPC.initSocket();
     cout << "Starting server." << endl;
     thread serverThread = hostPC.startServer();
