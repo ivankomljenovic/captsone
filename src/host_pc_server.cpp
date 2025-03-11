@@ -16,18 +16,31 @@
 using namespace std;
 using namespace string_literals;
 
-void threadServer(Server activeServer){
-    char message[activeServer.bufferSize];
+mutex frame_lock; // protects frame
+int32_t frame[102];
+
+void threadServer(int socketFD, int bufferSize){
+    char message[bufferSize];
     struct sockaddr sourceAddress;
     socklen_t sourceLength;
 
 
     while (true){
-        if ((recvfrom(activeServer.socketFD, message, sizeof(message), 0, &sourceAddress, &sourceLength)) < 0){
+        if ((recvfrom(socketFD, message, sizeof(message), 0, &sourceAddress, &sourceLength)) < 0){
             cout << "Error: Error receiving the message." << endl;
 
             cout << "Shutting down the server." << endl;
             return;
+        }
+
+        {
+            lock_guard<mutex> g(frame_lock);
+
+            // Write the frame to the shared variable
+
+            for (int i = 0; i < 102; i++){
+                frame[i] = 0;
+            }
         }
 
         cout << "Received message: " << message << endl;
@@ -40,10 +53,6 @@ Server::Server(string serverIP, int portNumber, int bufferSize, bool v){
     this->portNumber = portNumber;
     verbose = v;
     this->bufferSize = bufferSize;
-
-    for (int i = 0; i < 102; i++){
-        frame[i] = 0;
-    }
 
     memset(&serverAddress, 0, sizeof(serverAddress));
     serverAddress.sin_family = AF_INET;
@@ -110,9 +119,18 @@ int Server::sendMessage(string message){
 }
 
 thread Server::startServer (){
-    thread serverThread(threadServer, this);
+    thread serverThread(threadServer, socketFD, bufferSize);
 
     return serverThread;
+}
+
+void readFrame(){ // please get a lock on frame_lock before using this function
+    cout << "Current Frame: " << endl;
+
+    for (int i = 0; i < 102; i++){
+        cout << frame[i] << " ";
+    }
+    cout << endl;
 }
 
 
@@ -138,7 +156,13 @@ int main(int argc, char *argv[]){
 
     // main loop
     while (true){
+        // Read the frame every 1 second
+        sleep(1);
+        {
+            lock_guard<mutex> g(frame_lock);
 
+            readFrame();
+        }
     }
 
 
