@@ -1,11 +1,16 @@
 #include <iostream>
-#include <netinet/in.h>
-#include <netdb.h>
-#include <unistd.h>
+// #include <netinet/in.h>
+// #include <netdb.h>
+// #include <unistd.h>
 #include <string>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+// #include <sys/socket.h>
+#include "lwip/inet.h"
+#include "lwip/ip_addr.h"
+#include "lwip/err.h"
+#include "lwip/udp.h"
+#include "lwipopts.h"
 #include <cstring>
+#include "platform.h"
 
 using namespace std;
 
@@ -40,20 +45,20 @@ class Client {
 
         int initSocket(){
             if ((socketFD = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
-                cout << "Error: Socket could not be initialized." << endl;
+                //cout << "Error: Socket could not be initialized." << endl;
                 return -1;
             }
             
             wasInitialized = true;
 
-            cout << "Socket successfully initialized." << endl;
+            //cout << "Socket successfully initialized." << endl;
 
             return 0;
         }
 
         int closeSocket(){
             if (!wasInitialized){
-                cout << "Error: Socket is not open." << endl;
+                //cout << "Error: Socket is not open." << endl;
                 return -1;
             }
             close(socketFD);
@@ -66,22 +71,22 @@ class Client {
             size_t bytesSent;
 
             if (!wasInitialized){
-                cout << "Error: Socket was not initialized." << endl;
+                //cout << "Error: Socket was not initialized." << endl;
                 return -1;
             }
                 
 
             if ((bytesSent = sendto(socketFD, (const char *)message.c_str(), bufferSize, 0, (const struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
-                cout << "Error: Could not send message." << endl;
+                //cout << "Error: Could not send message." << endl;
                 return -1;
             }
 
             if (verbose){
-                cout << "Message sent successfully:" << endl;        
-                cout << "Bytes sent: " << bytesSent << endl;
-                cout << "Address: " << addressName << endl;
-                cout << "Port: " << portNumber << endl;
-                cout << "Message: " << message << endl;
+                // cout << "Message sent successfully:" << endl;        
+                // cout << "Bytes sent: " << bytesSent << endl;
+                // cout << "Address: " << addressName << endl;
+                // cout << "Port: " << portNumber << endl;
+                // cout << "Message: " << message << endl;
             }
 
             return 0;
@@ -110,7 +115,7 @@ int main(int argc, char *argv[]){
     bool verbose = false; // do I want lots of output messages in the console?
 
     if (argc < 2){ // Requires 1 command line parameter, server IP address
-        cout << "Error: Server IP address requried. E.g. ./client 127.0.0.1 -v" << endl;
+        //cout << "Error: Server IP address requried. E.g. ./client 127.0.0.1 -v" << endl;
     }
 
     if (argc > 2 && (argv[2][0] == '-' && argv[2][1] == 'v')){
@@ -122,7 +127,7 @@ int main(int argc, char *argv[]){
 
     fpga_client.initSocket();
 
-    cout << "Sending test messages at 100 kHz." << endl;
+    //cout << "Sending test messages at 100 kHz." << endl;
 
     int count = 0; // variable for testing purposes
 
