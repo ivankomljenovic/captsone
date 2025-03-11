@@ -131,7 +131,7 @@ int main(int argc, char *argv[]){
 
         // update the frame with microphone data, for now populate with dummy data
         for (int i = 0; i < 102; i++){
-            fpga_client.frame[i] = i * count;
+            fpga_client.frame[i] = i + count;
         }
 
         fpga_client.sendFrame();
