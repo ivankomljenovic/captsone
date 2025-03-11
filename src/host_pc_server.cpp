@@ -24,6 +24,13 @@ void threadServer(int socketFD, int bufferSize){
     struct sockaddr sourceAddress;
     socklen_t sourceLength;
 
+    // Initialize some variables
+    int i = 0;
+    size_t pos = 0;
+    string entry = "";
+    string msg = "";
+    int lastSeq = -1;
+
 
     while (true){
         if ((recvfrom(socketFD, message, sizeof(message), 0, &sourceAddress, &sourceLength)) < 0){
@@ -33,17 +40,35 @@ void threadServer(int socketFD, int bufferSize){
             return;
         }
 
+        //cout << "Received message: " << message << endl;
+        msg = string(message);
         {
             lock_guard<mutex> g(frame_lock);
 
-            // Write the frame to the shared variable
+            // Parse through the message
+            while (msg.find(',') != string::npos){
+                //cout << i << endl;
+                pos = msg.find(',');
+                entry = msg.substr(0, pos);
+                //cout << entry << " " << pos << endl;
+                //cout << msg << endl;
+                msg.erase(0, pos + 1);
 
-            for (int i = 0; i < 102; i++){
-                frame[i] = 0;
+                if (i == 0){
+                    // this entry is the frame sequence number
+                    if (stoi(entry) != 1 && stoi(entry) <= lastSeq){ // already past this packet
+                        cout << "Received out of order packet. Skipping packet " << entry << endl;
+                        break; // this might lead to a bug if breaks from both while loops
+                    }else{
+                        lastSeq = stoi(entry);
+                    }
+                }else{
+                    frame[i-1] = stoi(entry);
+                }
+
+                i++;
             }
         }
-
-        cout << "Received message: " << message << endl;
     }
 }
 
@@ -148,7 +173,7 @@ int main(int argc, char *argv[]){
 
 
     // Initialize the server
-    Server hostPC(argv[1], 1864, 10000, verbose);
+    Server hostPC(argv[1], 1864, 100000, verbose);
     hostPC.initSocket();
     cout << "Starting server." << endl;
     thread serverThread = hostPC.startServer();

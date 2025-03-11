@@ -17,6 +17,8 @@ class Client {
         string addressName;
         int portNumber;
         bool verbose;
+        int32_t frame[102];
+        int lastSeq = 0;
 
         Client(string serverIP, int portNumber, bool v){
             addressName = serverIP;
@@ -27,6 +29,10 @@ class Client {
             serverAddress.sin_family = AF_INET;
             serverAddress.sin_port = htons(portNumber);
             inet_aton(serverIP.c_str(), &(serverAddress.sin_addr));
+
+            for (int i = 0; i < 102; i++){
+                frame[i] = i;
+            }
 
             socketFD = 0;
             wasInitialized = false;
@@ -80,6 +86,20 @@ class Client {
 
             return 0;
         }
+
+        int sendFrame(){
+            string msg = "";
+
+            msg = msg + to_string(++lastSeq);
+            
+            for (int i = 0; i < 102; i++){
+                msg = msg + ',' + to_string(frame[i]);
+            }
+
+            cout << msg << endl;
+
+            return sendMessage(msg);
+        }
 };
 
 
@@ -118,11 +138,13 @@ int main(int argc, char *argv[]){
 
     cout << "Sending test messages at 100 kHz." << endl;
 
-    while (true){
-        usleep(10);
+    // while (true){
+    //     usleep(10);
 
-        fpga_client.sendMessage(my_message);
-    }
+    //     fpga_client.sendFrame();
+    // }
+
+    fpga_client.sendFrame();
 
     fpga_client.closeSocket();
 }
