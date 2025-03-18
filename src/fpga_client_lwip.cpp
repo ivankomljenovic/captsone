@@ -5,6 +5,7 @@
 #include "lwip/ip_addr.h"
 #include "lwip/dhcp.h"
 #include "netif/etharp.h"
+#include <sleep.h>
 
 #include <iostream>
 #include <string>
@@ -91,7 +92,7 @@ class Client {
                 return -1;
             }
 
-            memcpy(p->payload, message, bufferSize);
+            memcpy(p->payload, message.c_str(), bufferSize);
 
             err_t err = udp_sendto(pcb, p, &serverAddress, portNumber);
 
