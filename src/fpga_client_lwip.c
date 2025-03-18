@@ -84,7 +84,7 @@ int Client_sendMessage(struct Client* client, const char* message, int bufferSiz
     }
 
     memcpy(p->payload, message, strlen(message) + 1);
-
+    
     err_t err = udp_sendto(client->pcb, p, &client->serverAddress, client->portNumber);
 
     if (err == ERR_MEM) {
