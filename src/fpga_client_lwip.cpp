@@ -7,6 +7,9 @@
 #include "netif/etharp.h"
 #include <sleep.h>
 
+#include "platform.h"
+#include "xil_printf.h"
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -44,7 +47,7 @@ class Client {
 
         int initSocket(){
             if (wasInitialized){
-                cout << "Error: Socket was already initialized." << endl;
+                xil_printf("Error: Socket was already initialized.\n");
                 return -1;
             }
             
@@ -53,20 +56,20 @@ class Client {
             pcb = udp_new();
 
             if (!pcb){
-                cout << "Error: UDP PCB could not be created." << endl;
+                xil_printf("Error: UDP PCB could not be created.\n");
                 return -1;
             }
             
             wasInitialized = true;
 
-            cout << "UDP PCB successfully initialized." << endl;
+            xil_printf("UDP PCB successfully initialized.\n");
 
             return 0;
         }
 
         int closeSocket(){
             if (!wasInitialized){
-                cout << "Error: Socket is not open." << endl;
+                xil_printf("Error: Socket is not open.\n");
                 return -1;
             }
 
@@ -79,7 +82,7 @@ class Client {
         int sendMessage(string message, int bufferSize){
             
             if (!wasInitialized){
-                cout << "Error: Socket was not initialized." << endl;
+                xil_printf("Error: Socket was not initialized.\n");
                 return -1;
             }
 
@@ -88,7 +91,7 @@ class Client {
             p = pbuf_alloc(PBUF_TRANSPORT, bufferSize, PBUF_RAM);
 
             if (p == NULL){
-                cout << "Error: Failed to allocate pbuf" << endl;
+                xil_printf("Error: Failed to allocate pbuf\n")
                 return -1;
             }
 
@@ -97,15 +100,15 @@ class Client {
             err_t err = udp_sendto(pcb, p, &serverAddress, portNumber);
 
             if (err != ERR_OK){
-                cout << "Error: UDP packet could not be sent." << endl;
+                xil_printf("Error: UDP packet could not be sent.\n");
                 return -1;
             }
 
             if (verbose){
-                cout << "Message sent successfully:" << endl;        
-                cout << "Address: " << addressName << endl;
-                cout << "Port: " << portNumber << endl;
-                cout << "Message: " << message << endl;
+                xil_printf("Message sent successfully:\n");     
+                xil_printf("Address: " + addressName + "\n");
+                xil_printf("Port: %d\n", portNumber);
+                xil_printf("Message: " + message + "\n");
             }
 
             pbuf_free(p);
@@ -132,23 +135,13 @@ class Client {
 
 
 
-int main(int argc, char *argv[]){
-    bool verbose = false; // do I want lots of output messages in the console?
-
-    if (argc < 2){ // Requires 1 command line parameter, server IP address
-        cout << "Error: Server IP address requried. E.g. ./client 127.0.0.1 -v" << endl;
-    }
-
-    if (argc > 2 && (argv[2][0] == '-' && argv[2][1] == 'v')){
-        verbose = true;
-    }
-
+int main(){
     // Main program - send one test message
-    Client fpga_client(argv[1],1864, verbose); // port number specified here
+    Client fpga_client("127.0.0.1",1864, true); // port number specified here
 
     fpga_client.initSocket();
 
-    cout << "Sending test messages at 100 kHz." << endl;
+    xil_printf("Sending test messages at 100 kHz.\n");
 
     int count = 0; // variable for testing purposes
 
