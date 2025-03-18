@@ -47,7 +47,7 @@ class Client {
 
         int initSocket(){
             if (wasInitialized){
-                xil_printf("Error: Socket was already initialized.\n");
+                xil_printf("Error: Socket was already initialized.\r\n");
                 return -1;
             }
             
@@ -56,20 +56,20 @@ class Client {
             pcb = udp_new();
 
             if (!pcb){
-                xil_printf("Error: UDP PCB could not be created.\n");
+                xil_printf("Error: UDP PCB could not be created.\r\n");
                 return -1;
             }
             
             wasInitialized = true;
 
-            xil_printf("UDP PCB successfully initialized.\n");
+            xil_printf("UDP PCB successfully initialized.\r\n");
 
             return 0;
         }
 
         int closeSocket(){
             if (!wasInitialized){
-                xil_printf("Error: Socket is not open.\n");
+                xil_printf("Error: Socket is not open.\r\n");
                 return -1;
             }
 
@@ -82,33 +82,33 @@ class Client {
         int sendMessage(string message, int bufferSize){
             
             if (!wasInitialized){
-                xil_printf("Error: Socket was not initialized.\n");
+                xil_printf("Error: Socket was not initialized.\r\n");
                 return -1;
             }
 
             struct pbuf *p;
 
-            p = pbuf_alloc(PBUF_TRANSPORT, bufferSize, PBUF_RAM);
+            p = pbuf_alloc(PBUF_TRANSPORT, sizeof(message.c_str()), PBUF_RAM);
 
             if (p == NULL){
-                xil_printf("Error: Failed to allocate pbuf\n");
+                xil_printf("Error: Failed to allocate pbuf\r\n");
                 return -1;
             }
 
-            memcpy(p->payload, message.c_str(), bufferSize);
+            memcpy(p->payload, message.c_str(), sizeof(message.c_str()));
 
             err_t err = udp_sendto(pcb, p, &serverAddress, portNumber);
 
             if (err != ERR_OK){
-                xil_printf("Error: UDP packet could not be sent.\n");
+                xil_printf("Error: UDP packet could not be sent.\r\n");
                 return -1;
             }
 
             if (verbose){
-                xil_printf("Message sent successfully:\n");     
-                xil_printf("Address: %s\n", addressName);
-                xil_printf("Port: %d\n", portNumber);
-                xil_printf("Message: %s\n", message);
+                xil_printf("Message sent successfully:\r\n");     
+                xil_printf("Address: %s\r\n", addressName);
+                xil_printf("Port: %d\r\n", portNumber);
+                xil_printf("Message: %s\r\n", message);
             }
 
             pbuf_free(p);
@@ -141,7 +141,7 @@ int main(){
 
     fpga_client.initSocket();
 
-    xil_printf("Sending test messages at 100 kHz.\n");
+    xil_printf("Sending test messages at 100 kHz.\r\n");
 
     int count = 0; // variable for testing purposes
 
