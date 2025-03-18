@@ -92,6 +92,7 @@ class Client {
 
             if (p == NULL){
                 xil_printf("Error: Failed to allocate pbuf\r\n");
+                pbuf_free(p);
                 return -1;
             }
 
@@ -101,6 +102,7 @@ class Client {
 
             if (err != ERR_OK){
                 xil_printf("Error: UDP packet could not be sent.\r\n");
+                pbuf_free(p);
                 return -1;
             }
 
