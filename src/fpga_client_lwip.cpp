@@ -150,6 +150,8 @@ class Client {
 
 
 int main(){
+    platform_init();
+    
     // Main program - send one test message
     Client fpga_client("196.0.0.1",12345, true); // port number specified here
 
