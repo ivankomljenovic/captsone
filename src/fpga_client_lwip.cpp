@@ -139,7 +139,7 @@ class Client {
 
 int main(){
     // Main program - send one test message
-    Client fpga_client("127.0.0.1",1864, true); // port number specified here
+    Client fpga_client("196.0.0.1",12345, true); // port number specified here
 
     fpga_client.initSocket();
 
