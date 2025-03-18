@@ -91,7 +91,7 @@ class Client {
             p = pbuf_alloc(PBUF_TRANSPORT, bufferSize, PBUF_RAM);
 
             if (p == NULL){
-                xil_printf("Error: Failed to allocate pbuf\n")
+                xil_printf("Error: Failed to allocate pbuf\n");
                 return -1;
             }
 
@@ -106,9 +106,9 @@ class Client {
 
             if (verbose){
                 xil_printf("Message sent successfully:\n");     
-                xil_printf("Address: " + addressName + "\n");
+                xil_printf("Address: %s\n", addressName);
                 xil_printf("Port: %d\n", portNumber);
-                xil_printf("Message: " + message + "\n");
+                xil_printf("Message: %s\n", message);
             }
 
             pbuf_free(p);
