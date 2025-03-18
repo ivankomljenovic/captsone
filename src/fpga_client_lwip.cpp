@@ -1,7 +1,9 @@
-#include "lwip/opt.h"
+#include "lwip/udp.h"
+#include "lwip/sys.h"
 #include "lwip/init.h"
-#include "lwip/sockets.h"
 #include "lwip/netif.h"
+#include "lwip/ip_addr.h"
+#include "lwip/dhcp.h"
 #include "netif/etharp.h"
 
 #include <iostream>
@@ -12,8 +14,9 @@ using namespace std;
 
 class Client {
     public:
-        int socketFD;
-        struct sockaddr_in serverAddress;
+        ip_addr_t serverAddress;
+        struct udp_pcb *pcb;
+        
         bool wasInitialized;
         string addressName;
         int portNumber;
@@ -26,16 +29,15 @@ class Client {
             this->portNumber = portNumber;
             verbose = v;
 
-            memset(&serverAddress, 0, sizeof(serverAddress));
-            serverAddress.sin_family = AF_INET;
-            serverAddress.sin_port = htons(portNumber);
-            inet_aton(serverIP.c_str(), &(serverAddress.sin_addr));
+            // memset(&serverAddress, 0, sizeof(serverAddress));
+            // serverAddress.sin_family = AF_INET;
+            // serverAddress.sin_port = htons(portNumber);
+            ipaddr_aton(serverIP.c_str(), &serverAddress);
 
             for (int i = 0; i < 102; i++){
                 frame[i] = 1;
             }
 
-            socketFD = 0;
             wasInitialized = false;
         }
 
@@ -47,14 +49,16 @@ class Client {
             
             lwip_init();
 
-            if ((socketFD = socket(AF_INET, SOCK_DGRAM, IP_PROTO_UDP)) < 0){
-                cout << "Error: Socket could not be initialized." << endl;
+            pcb = udp_new();
+
+            if (!pcb){
+                cout << "Error: UDP PCB could not be created." << endl;
                 return -1;
             }
             
             wasInitialized = true;
 
-            cout << "Socket successfully initialized." << endl;
+            cout << "UDP PCB successfully initialized." << endl;
 
             return 0;
         }
@@ -64,33 +68,46 @@ class Client {
                 cout << "Error: Socket is not open." << endl;
                 return -1;
             }
-            close(socketFD);
+
+            udp_remove(pcb);
 
             wasInitialized = false;
             return 0;
         }
 
         int sendMessage(string message, int bufferSize){
-            size_t bytesSent;
-
+            
             if (!wasInitialized){
                 cout << "Error: Socket was not initialized." << endl;
                 return -1;
             }
-                
 
-            if ((bytesSent = sendto(socketFD, (const char *)message.c_str(), bufferSize, 0, (const struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
-                cout << "Error: Could not send message." << endl;
+            struct pbuf *p;
+
+            p = pbuf_alloc(PBUF_TRANSPORT, bufferSize, PBUF_RAM);
+
+            if (p == NULL){
+                cout << "Error: Failed to allocate pbuf" << endl;
+                return -1;
+            }
+
+            memcpy(p->payload, message, bufferSize);
+
+            err_t err = udp_sendto(pcb, p, &serverAddress, portNumber);
+
+            if (err != ERR_OK){
+                cout << "Error: UDP packet could not be sent." << endl;
                 return -1;
             }
 
             if (verbose){
                 cout << "Message sent successfully:" << endl;        
-                cout << "Bytes sent: " << bytesSent << endl;
                 cout << "Address: " << addressName << endl;
                 cout << "Port: " << portNumber << endl;
                 cout << "Message: " << message << endl;
             }
+
+            pbuf_free(p);
 
             return 0;
         }
