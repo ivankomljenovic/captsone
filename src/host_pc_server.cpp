@@ -165,7 +165,7 @@ int main(int argc, char *argv[]){
     bool verbose = false;
 
     if (argc < 2){
-        cout << "Error: Requires the server IP address. E.g. ./server 127.0.0.1 -v" << endl;
+        cout << "Error: Requires the server IP address. E.g. ./server 192.168.1.100 -v" << endl;
         return -1;
     }
 
@@ -174,7 +174,7 @@ int main(int argc, char *argv[]){
 
 
     // Initialize the server
-    Server hostPC(argv[1], 12345, 2048, verbose);
+    Server hostPC(argv[1], 5001, 2048, verbose);
     hostPC.initSocket();
     cout << "Starting server." << endl;
     thread serverThread = hostPC.startServer();
