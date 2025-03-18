@@ -135,7 +135,7 @@ int Client_sendFrame(struct Client* client) {
 // Main function to start the custom application
 int start_custom_application() {
     struct Client fpga_client;
-    Client_init(&fpga_client, "196.0.0.1", 12345, 1);  // Initialize with server IP, port, and verbosity
+    Client_init(&fpga_client, "192.168.1.100", 5001, 1);  // Initialize with server IP, port, and verbosity
 
     xil_printf("Sending test messages at 100 kHz.\r\n");
 
