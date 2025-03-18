@@ -70,6 +70,8 @@ int Client_close(struct Client* client) {
 
 // Function to send a message
 int Client_sendMessage(struct Client* client, const char* message, int bufferSize) {
+    xil_printf("Got to send message.\r\n");
+
     if (!client->wasInitialized) {
         xil_printf("Error: Socket was not initialized.\r\n");
         return -1;
@@ -110,6 +112,8 @@ int Client_sendMessage(struct Client* client, const char* message, int bufferSiz
         xil_printf("Message: %s\r\n", message);
     }
 
+     xil_printf("About to leave send message.\r\n");
+
     pbuf_free(p);
     return 0;
 }
@@ -124,6 +128,7 @@ int Client_sendFrame(struct Client* client) {
         snprintf(msg + strlen(msg), sizeof(msg) - strlen(msg), ",%d", client->frame[i]);
     }
 
+    xil_printf("About to call Client_sendMessage().\r\n");
     return Client_sendMessage(client, msg, sizeof(msg));
 }
 
@@ -144,6 +149,7 @@ int start_custom_application() {
             fpga_client.frame[i] = i + count;
         }
 
+        xil_printf("About to call Client_sendFrame().\r\n");
         // Send the frame
         Client_sendFrame(&fpga_client);
 
