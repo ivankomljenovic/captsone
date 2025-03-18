@@ -100,8 +100,20 @@ class Client {
 
             err_t err = udp_sendto(pcb, p, &serverAddress, portNumber);
 
-            if (err != ERR_OK){
-                xil_printf("Error: UDP packet could not be sent.\r\n");
+            if (err == ERR_MEM){
+                xil_printf("Error: Out of memory.\r\n");
+                pbuf_free(p);
+                return -1;
+            }else if (err == ERR_RTE){
+                xil_printf("Error: Could not find route to destination address.\r\n");
+                pbuf_free(p);
+                return -1;
+            }else if (err == ERR_VAL){
+                xil_printf("Error: No PCB or PCB is dual-stack.\r\n");
+                pbuf_free(p);
+                return -1;
+            }else if (err != ERR_OK){
+                xil_printf("Error: Lower protocol error.\r\n");
                 pbuf_free(p);
                 return -1;
             }
