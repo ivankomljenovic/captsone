@@ -110,7 +110,7 @@ int main(int argc, char *argv[]){
     bool verbose = false; // do I want lots of output messages in the console?
 
     if (argc < 2){ // Requires 1 command line parameter, server IP address
-        cout << "Error: Server IP address requried. E.g. ./client 127.0.0.1 -v" << endl;
+        cout << "Error: Server IP address requried. E.g. ./client 192.168.1.100 -v" << endl;
     }
 
     if (argc > 2 && (argv[2][0] == '-' && argv[2][1] == 'v')){
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]){
     }
 
     // Main program - send one test message
-    Client fpga_client(argv[1],1864, verbose);
+    Client fpga_client(argv[1],5001, verbose);
 
     fpga_client.initSocket();
 
