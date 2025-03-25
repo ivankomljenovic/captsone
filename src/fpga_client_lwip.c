@@ -141,20 +141,23 @@ int start_custom_application() {
 
     int count = 0;
 
-    while (1) {
-        usleep(10);  // Sleep for 10 microseconds (100 kHz)
+    // while (1) {
+    //     usleep(10);  // Sleep for 10 microseconds (100 kHz)
 
         // Update the frame with dummy data for testing
-        for (int i = 0; i < FRAME_SIZE; i++) {
-            fpga_client.frame[i] = i + count;
-        }
+    //    for (int i = 0; i < FRAME_SIZE; i++) {
+    //        fpga_client.frame[i] = i + count;
+    //    }
 
-        xil_printf("About to call Client_sendFrame().\r\n");
+    //    xil_printf("About to call Client_sendFrame().\r\n");
         // Send the frame
-        Client_sendFrame(&fpga_client);
+    //    Client_sendFrame(&fpga_client);
 
-        count++;
-    }
+    //    count++;
+    // }
+
+    xil_printf("About to call Client_sendMessage()");
+    Client_sendMessage(&fpga_client, "hello world", sizeof("hello world"));
 
     Client_close(&fpga_client);
     return 0;
