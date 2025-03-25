@@ -17,7 +17,7 @@
 struct Client {
     ip_addr_t serverAddress;
     struct udp_pcb *pcb;
-    int wasInitialized;
+    int wasInitialized = 0;
     char addressName[16];
     int portNumber;
     int verbose;
