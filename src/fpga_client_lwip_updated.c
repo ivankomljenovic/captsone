@@ -57,7 +57,7 @@ int main() {
 
     netif_set_default(echo_netif);
 
-    platform_enable_interrupts();
+    // platform_enable_interrupts();
 
     netif_set_up(echo_netif);
 
