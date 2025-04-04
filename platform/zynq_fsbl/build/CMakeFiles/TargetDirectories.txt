@@ -1,0 +1,3 @@
+C:/elec498/captsone/platform/zynq_fsbl/build/CMakeFiles/fsbl.elf.dir
+C:/elec498/captsone/platform/zynq_fsbl/build/CMakeFiles/edit_cache.dir
+C:/elec498/captsone/platform/zynq_fsbl/build/CMakeFiles/rebuild_cache.dir
