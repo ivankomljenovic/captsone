@@ -23,8 +23,6 @@ class Server {
         int portNumber;
         bool verbose;
         int bufferSize;
-        mutex frameLock; // protects frame
-        int32_t frame[102];
 
         Server(string serverIP, int portNumber, int bufferSize, bool v);
 

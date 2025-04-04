@@ -107,8 +107,60 @@ int sendMessage(const char* message, int bufferSize) {
         xil_printf("Error: No PCB or PCB is dual-stack.\r\n");
         pbuf_free(p);
         return -1;
-    } else if (err != ERR_OK) {
-        xil_printf("Error: Lower protocol error.\r\n");
+    } else if (err == ERR_BUF) {
+        xil_printf("Error: Buffer error.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_TIMEOUT) {
+        xil_printf("Error: Timeout.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_INPROGRESS) {
+        xil_printf("Error: Operation in progress.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_WOULDBLOCK) {
+        xil_printf("Error: Operation would block.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_USE) {
+        xil_printf("Error: Address in use.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_ALREADY) {
+        xil_printf("Error: Already connecting.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_ISCONN) {
+        xil_printf("Error: Conn already established.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_CONN) {
+        xil_printf("Error: Not connected.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_IF) {
+        xil_printf("Error: Low-level netif error.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_ABRT) {
+        xil_printf("Error: Connection aborted.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_RST) {
+        xil_printf("Error: Connection reset.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_CLSD) {
+        xil_printf("Error: Connection closed.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err == ERR_ARG) {
+        xil_printf("Error: Illegal argument.\r\n");
+        pbuf_free(p);
+        return -1;
+    } else if (err != ERR_OK){
+        xil_printf("Error: Unknown error.\r\n");
         pbuf_free(p);
         return -1;
     }
