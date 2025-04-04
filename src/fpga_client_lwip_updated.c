@@ -11,6 +11,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "netif/xadapter.h"
+
 #define FRAME_SIZE 102
 #define PORT_NUMBER 8080
 
@@ -26,6 +28,8 @@ void print_app_header() {
 	xil_printf("\n\r\n\r-----lwip UDP Transfer Mic Data------\n\r");
 	xil_printf("UDP packets being sent to port %d\n\r", PORT_NUMBER);
 }
+
+int start_custom_application();
 
 int main() {
     ip_addr_t ipaddr, netmask, gw;
@@ -88,7 +92,7 @@ int sendMessage(const char* message, int bufferSize) {
 
     memcpy(p->payload, message, strlen(message) + 1);
     
-    err_t err = udp_sendto(pcb, p, &serverAddress, PORT_NUMBER);
+    err_t err = udp_sendto(pcb, p, serverAddress, PORT_NUMBER);
 
     if (err == ERR_MEM) {
         xil_printf("Error: Out of memory.\r\n");
