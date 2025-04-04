@@ -71,6 +71,11 @@ int main() {
 
     ipaddr_aton("192.168.1.10", serverAddress);
 
+    if ((udp_bind(pcb, serverAddress, 8080)) < 0){
+        xil_printf("Error: UDP PCB could not be bound.\r\n");
+        // return -1;
+    }
+
     // Initialize frame with dummy data
     for (int i = 0; i < FRAME_SIZE; i++) {
         frame[i] = 1;
