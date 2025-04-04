@@ -93,7 +93,7 @@ int sendMessage(const char* message, int bufferSize) {
 
     memcpy(p->payload, message, strlen(message) + 1);
     
-    err_t err = udp_sendto(pcb, p, serverAddress, PORT_NUMBER);
+    err_t err = udp_sendto(pcb, p, &serverAddress, PORT_NUMBER);
 
     if (err == ERR_MEM) {
         xil_printf("Error: Out of memory.\r\n");
