@@ -174,7 +174,7 @@ int main(int argc, char *argv[]){
 
 
     // Initialize the server
-    Server hostPC(argv[1], 5001, 2048, verbose);
+    Server hostPC(argv[1], 8080, 2048, verbose);
     hostPC.initSocket();
     cout << "Starting server." << endl;
     thread serverThread = hostPC.startServer();
