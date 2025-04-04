@@ -205,23 +205,23 @@ int start_custom_application() {
 
     int count = 0;
 
-    while (1) {
-        usleep(10);  // Sleep for 10 microseconds (100 kHz)
+    // while (1) {
+    //     usleep(10);  // Sleep for 10 microseconds (100 kHz)
 
-        // Update the frame with dummy data for testing
-        for (int i = 0; i < FRAME_SIZE; i++) {
-            frame[i] = i + count;
-        }
+    //     // Update the frame with dummy data for testing
+    //     for (int i = 0; i < FRAME_SIZE; i++) {
+    //         frame[i] = i + count;
+    //     }
 
-        //x il_printf("About to call Client_sendFrame().\r\n");
-        // Send the frame
-        sendFrame();
+    //     //x il_printf("About to call Client_sendFrame().\r\n");
+    //     // Send the frame
+    //     sendFrame();
 
-        count++;
-    }
+    //     count++;
+    // }
 
     // xil_printf("About to call sendMessage()");
-    // sendMessage("hello world", sizeof("hello world"));
+    sendMessage("hello world", sizeof("hello world"));
 
     return 0;
 }

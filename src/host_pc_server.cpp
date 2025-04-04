@@ -40,7 +40,7 @@ void threadServer(int socketFD, int bufferSize){
             return;
         }
 
-        //cout << "Received message: " << message << endl;
+        cout << "Received message: " << message << endl;
         msg = string(message);
         i = 0;
         {
@@ -185,9 +185,9 @@ int main(int argc, char *argv[]){
         // Read the frame every 1 second
         sleep(1);
         {
-            lock_guard<mutex> g(frame_lock);
+            // lock_guard<mutex> g(frame_lock);
 
-            readFrame();
+            // readFrame();
         }
     }
 
