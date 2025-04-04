@@ -22,6 +22,8 @@ int32_t frame[FRAME_SIZE];
 int lastSeq;
 ip_addr_t * serverAddress;
 
+ip_addr_t ipaddr;
+
 static struct netif server_netif;
 struct netif *echo_netif;
 
@@ -33,7 +35,7 @@ void print_app_header() {
 int start_custom_application();
 
 int main() {
-    ip_addr_t ipaddr, netmask, gw;
+    ip_addr_t netmask, gw;
 
     unsigned char mac_ethernet_address[] = { 0x00, 0x0a, 0x35, 0x00, 0x01, 0x02 };
 
@@ -98,7 +100,7 @@ int sendMessage(const char* message, int bufferSize) {
 
     memcpy(p->payload, message, strlen(message) + 1);
     
-    err_t err = udp_sendto(pcb, p, serverAddress, 8080);
+    err_t err = udp_sendto(pcb, p, &ipaddr, 8080);
 
     if (err == ERR_MEM) {
         xil_printf("Error: Out of memory.\r\n");
