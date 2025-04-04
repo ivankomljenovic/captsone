@@ -12,6 +12,7 @@
 #include <stdio.h>
 
 #include "netif/xadapter.h"
+#include "platform_config.h"
 
 #define FRAME_SIZE 102
 #define PORT_NUMBER 8080
