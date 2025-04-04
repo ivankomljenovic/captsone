@@ -68,7 +68,7 @@ int main() {
 
     // Initialize frame with dummy data
     for (int i = 0; i < FRAME_SIZE; i++) {
-        client->frame[i] = 1;
+        frame[i] = 1;
     }
 
     start_custom_application();
